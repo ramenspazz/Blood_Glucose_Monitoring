@@ -47,7 +47,7 @@ pub fn plot_data(data: &Vec<DataTrack>) {
             .collect();
 
         // Create the LineSeries with the modified points
-        let series = LineSeries::new(points, &cur_colour);
+        let series = LineSeries::new(points, *&cur_colour.filled()).point_size(5);
         use plotters::prelude::*;
         // Draw the LineSeries
         chart_context
