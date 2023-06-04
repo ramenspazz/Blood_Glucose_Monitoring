@@ -17,14 +17,13 @@ pub fn plot_data(data: &Vec<DataTrack>) {
     let drawing_area = BitMapBackend::new("scatter.png", (1920, 1080)).into_drawing_area();
     drawing_area.fill(&WHITE).unwrap();
 
-    let mut chart = ChartBuilder::on(&drawing_area)
-        .x_label_area_size(40)
-        .y_label_area_size(40)
-        .build_cartesian_2d(0..24, 0..650)
-        .unwrap();
-
-    chart
-        .configure_mesh()
+    let mut asdf = ChartBuilder::on(&drawing_area);
+    let chart_builder = asdf
+        .margin(10)
+        .set_left_and_bottom_label_area_size(20);
+        
+    let mut chart_context = chart_builder.build_cartesian_2d(0.0..24.0, 0.0..650.0).unwrap();
+    chart_context.configure_mesh()
         .x_labels(24)
         .y_labels(32)
         .x_desc("Time (hours)")
@@ -40,21 +39,21 @@ pub fn plot_data(data: &Vec<DataTrack>) {
     for track in data {
         let cur_colour: RGBColor = generate_random_color();
 
-        let points: Vec<(i32, i32)> = track
+        let points: Vec<(f64,f64)> = track
             .blood_glucose_vec
             .iter()
             .enumerate()
-            .map(|(i, &(x, y))| (x as i32, y as i32))
+            .map(|(_i, &(x, y))| (x as f64, y as f64))
             .collect();
 
         // Create the LineSeries with the modified points
         let series = LineSeries::new(points, &cur_colour);
-
+        use plotters::prelude::*;
         // Draw the LineSeries
-        chart
+        chart_context
             .draw_series(series)
             .unwrap();
-
+    
         let daily_mean_blood_glucose = data_math::mean(&track.blood_glucose_vec).unwrap();
         match data_math::std_deviation(&track.blood_glucose_vec, daily_mean_blood_glucose) {
             Some(std_dev) => {
@@ -81,17 +80,15 @@ pub fn plot_data(data: &Vec<DataTrack>) {
         }
     }
 
-    use plotters::prelude::*;
-
     // Draw legend
-    let drawing_area = chart.plotting_area().clone();
+    let drawing_area = chart_context.plotting_area().clone();
     for (i, &(ref label, color)) in legend_labels.iter().enumerate() {
-        let rect_width = 1;                             // Width of the legend color rectangle
-        let rect_height = 20;                           // Height of the legend color rectangle
-        let rect_x = 2;                                 // X coordinate of the top-left corner of the rectangle
-        let rect_y = (i * 25 + 5 + 256 + 128) as i32;   // Y coordinate of the top-left corner of the rectangle
-        let text_x = 2;                             // X coordinate of the legend label
-        let text_y = (i * 25 + 21 + 256 + 128) as i32;  // Y coordinate of the legend label
+        let rect_width: f64 = 1f64;                             // Width of the legend color rectangle
+        let rect_height: f64 = 20f64;                           // Height of the legend color rectangle
+        let rect_x: f64 = 2f64;                                 // X coordinate of the top-left corner of the rectangle
+        let rect_y = (i * 25 + 5 + 256 + 128) as f64;   // Y coordinate of the top-left corner of the rectangle
+        let text_x: f64 = 2f64;                                 // X coordinate of the legend label
+        let text_y = (i * 25 + 21 + 256 + 128) as f64;  // Y coordinate of the legend label
 
         let formatted_label = format!("Day {}", label);  // Add "Day" prefix to the label
 
@@ -116,7 +113,7 @@ pub fn plot_data(data: &Vec<DataTrack>) {
     }
 
     // Position the legend in the top right corner
-    chart
+    chart_context
         .configure_series_labels()
         .position(SeriesLabelPosition::UpperRight)
         .draw()

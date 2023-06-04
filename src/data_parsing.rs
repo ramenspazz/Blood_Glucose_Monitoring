@@ -47,14 +47,17 @@ pub fn parse_data(file: &mut std::fs::File) -> Vec<data_point::DataTrack> {
                 match readin::readin(file) {
                     Some(number) => {
                         match j {
-                            0 => temp_blg1 = number as f64,
+                            0 => {
+                                temp_blg1 = number as f64;
+                                was_working = true;
+                            },
                             1 => long_units_1 = number as f64,
                             2 => fast_units_1 = number as f64,
                             3 => food_eaten = number as u8,
                             4 => temp_time1 = (number / 3600.0) as f64,
                             5 => {
-                                was_working = true;
                                 _cur_day = number as u16;
+                                println!["{}", &_cur_day];
                                 if first_run {
                                     last_day = _cur_day;
                                     first_run = false;

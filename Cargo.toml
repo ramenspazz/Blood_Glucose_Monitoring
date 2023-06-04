@@ -1,13 +1,19 @@
 [package]
-name = "hana_insulin"
-version = "0.1.0"
-edition = "2021"
+name = "charts"
+version = "0.3.0"
+authors = ["Iulian Gulea <iulian.gulea@gmail.com>"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+description = "A pure Rust visualization library inspired by D3.js"
+keywords = ["chart", "plot", "graph", "visualization"]
+categories = ["visualization", "science"]
+repository = "https://github.com/askanium/rustplotlib"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 rayon = "^1.7.0"
-plotlib = "^0.5.1"
 rand = "^0.8.5"
-nalgebra = "^0.32.2"
-nlopt = "^0.6.0"
+svg="^0.13.1"
+plotters = "^0.3.4"
