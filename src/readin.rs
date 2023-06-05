@@ -27,9 +27,9 @@ pub fn readin(mut file: &mut std::fs::File) -> Option<f64> {
                         }
                     }
                     Some(final_number)
-                }
+                };
             }
-            return None
+            return None;
         }
         match u8_buf.get(0) {
             Some(char_val) => {
@@ -39,45 +39,45 @@ pub fn readin(mut file: &mut std::fs::File) -> Option<f64> {
                             let mut final_number: f64 = 0.0;
                             let final_num = num_char_before_decimal + num_char_after_decimal;
                             for arr_index in 0..final_num {
-                                let current_digit = *num_arr.get(arr_index as usize).unwrap() as f64;
-        
+                                let current_digit =
+                                    *num_arr.get(arr_index as usize).unwrap() as f64;
+
                                 if arr_index < num_char_before_decimal {
                                     final_number = final_number * 10f64 + current_digit;
                                 } else {
-                                    let decimal_place = (arr_index - num_char_before_decimal + 1) as f64;
+                                    let decimal_place =
+                                        (arr_index - num_char_before_decimal + 1) as f64;
                                     final_number += current_digit / 10f64.powf(decimal_place);
                                 }
                             }
                             Some(final_number)
-                        }
+                        };
                     }
                     if *char_val == 0xA || *char_val == 0x0 {
                         return {
                             let mut final_number: f64 = 0.0;
                             let final_num = num_char_before_decimal + num_char_after_decimal;
                             for arr_index in 0..final_num {
-                                let current_digit = *num_arr.get(arr_index as usize).unwrap() as f64;
-        
+                                let current_digit =
+                                    *num_arr.get(arr_index as usize).unwrap() as f64;
+
                                 if arr_index < num_char_before_decimal {
                                     final_number = final_number * 10f64 + current_digit;
                                 } else {
-                                    let decimal_place = (arr_index - num_char_before_decimal + 1) as f64;
+                                    let decimal_place =
+                                        (arr_index - num_char_before_decimal + 1) as f64;
                                     final_number += current_digit / 10f64.powf(decimal_place);
                                 }
                             }
                             Some(final_number)
-                        }
+                        };
+                    } else {
+                        continue 'top;
                     }
-                    else {
-                        continue 'top
-                    }
-                }
-                
-                else if *char_val == 0x23 {
+                } else if *char_val == 0x23 {
                     comment = true;
-                }
-                else if *char_val == 0x20 && reading_number && !comment  {
-                // character is a space and we are not at a comment, go ahead and return the number
+                } else if *char_val == 0x20 && reading_number && !comment {
+                    // character is a space and we are not at a comment, go ahead and return the number
                     return {
                         let mut final_number: f64 = 0.0;
                         let final_num = num_char_before_decimal + num_char_after_decimal;
@@ -87,18 +87,17 @@ pub fn readin(mut file: &mut std::fs::File) -> Option<f64> {
                             if arr_index < num_char_before_decimal {
                                 final_number = final_number * 10f64 + current_digit;
                             } else {
-                                let decimal_place = (arr_index - num_char_before_decimal + 1) as f64;
+                                let decimal_place =
+                                    (arr_index - num_char_before_decimal + 1) as f64;
                                 final_number += current_digit / 10f64.powf(decimal_place);
                             }
                         }
                         Some(final_number)
-                    }
-                }
-                else if *char_val == 0x20 && reading_number && comment {
-                    continue 'top
-                }
-                else if *char_val == 0xA || *char_val == 0x0 {
-                // If the character is a space or newline, stop adding digits and compute the final number
+                    };
+                } else if *char_val == 0x20 && reading_number && comment {
+                    continue 'top;
+                } else if *char_val == 0xA || *char_val == 0x0 {
+                    // If the character is a space or newline, stop adding digits and compute the final number
                     return {
                         let mut final_number: f64 = 0.0;
                         let final_num = num_char_before_decimal + num_char_after_decimal;
@@ -108,19 +107,19 @@ pub fn readin(mut file: &mut std::fs::File) -> Option<f64> {
                             if arr_index < num_char_before_decimal {
                                 final_number = final_number * 10f64 + current_digit;
                             } else {
-                                let decimal_place = (arr_index - num_char_before_decimal + 1) as f64;
+                                let decimal_place =
+                                    (arr_index - num_char_before_decimal + 1) as f64;
                                 final_number += current_digit / 10f64.powf(decimal_place);
                             }
                         }
                         Some(final_number)
-                    }
+                    };
                 } else if *char_val == 0x2E {
-                // The character is a decimal point, mark that we are now processing decimals
+                    // The character is a decimal point, mark that we are now processing decimals
                     reading_dec = true;
                     continue;
-                } 
-                else if *char_val >= 0x30 && *char_val <= 0x39 {
-                // The character is an ascii number and we can work with it
+                } else if *char_val >= 0x30 && *char_val <= 0x39 {
+                    // The character is an ascii number and we can work with it
                     if reading_number == false {
                         reading_number = true;
                     }
@@ -132,16 +131,16 @@ pub fn readin(mut file: &mut std::fs::File) -> Option<f64> {
                         num_char_before_decimal += 1;
                     }
 
-                    match num_arr.get_mut((num_char_before_decimal + num_char_after_decimal - 1) as usize) {
+                    match num_arr
+                        .get_mut((num_char_before_decimal + num_char_after_decimal - 1) as usize)
+                    {
                         Some(value) => *value = current_digit,
                         None => panic!(),
                     }
                 } // else if *char_val >= 48u8 && *char_val <= 57u8
             } // Some(char_val) => {
-            None => {
-                return None
-            },
+            None => return None,
         } // match u8_buf.get(0) {
     } // 'top: while let Ok(read_bytes) = std::io::Read::read(&mut file, &mut u8_buf) {
-    return None
+    return None;
 }

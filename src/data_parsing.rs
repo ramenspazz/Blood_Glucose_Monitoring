@@ -1,7 +1,7 @@
 use crate::data_point;
 use crate::readin;
-use std::path::Path;
 use std::io::Write;
+use std::path::Path;
 
 const MAX_SIZE: usize = 0xFFFF_FFFF_FFFF_FFFF;
 const BITS_16: usize = 0xFFFF;
@@ -10,14 +10,17 @@ pub fn openfile() -> Option<std::fs::File> {
     loop {
         // Create a path to the desired file
         // println!["Enter the path to data, or ..exit to exit: "];
-        // let path_str = getln![];
+        // let path_str = readln![];
         // if path_str.trim() == "..exit" {
         //     return None
         // }
         let path_str = "insulin.csv";
-        let path: &Path = Path::new({let binding: &str = path_str.trim(); binding}); // create and bind a value and assign it to path
+        let path: &Path = Path::new({
+            let binding: &str = path_str.trim();
+            binding
+        }); // create and bind a value and assign it to path
         let _display: std::path::Display = path.display();
-    
+
         // Open the path in read-only mode, returns `io::Result<File>`
         let mut _file: std::fs::File = match std::fs::File::open(&path) {
             Err(_) => continue,
@@ -34,30 +37,31 @@ pub fn parse_data(file: &mut std::fs::File) -> Vec<data_point::DataTrack> {
 
     loop {
         let mut cur_data_track: data_point::DataTrack = data_point::DataTrack::new();
-        let mut temp_blg1: f64 = 0f64;
-        let mut fast_units_1: f64 = 0f64;
-        let mut long_units_1: f64 = 0f64;
-        let mut food_eaten: u8 = 0u8;
-        let mut temp_time1: f64 = 0f64;
+        let mut blood_glucose_1: f64 = 0f64;
+        let mut u100_units_1: f64 = 0f64;
+        let mut u40_units_1: f64 = 0f64;
+        let mut food_eaten: f64 = 0f64;
+        let mut time_1: f64 = 0f64;
 
         let mut was_working: bool = false;
 
-        'a: for _ in 0..MAX_SIZE { // this loop will go for MAX_SIZE data rows total
-            for j in 0..6 { // this loop collects a current rows data
+        'a: for _ in 0..MAX_SIZE {
+            // this loop will go for MAX_SIZE data rows total
+            for j in 0..6 {
+                // this loop collects a current rows data
                 match readin::readin(file) {
                     Some(number) => {
                         match j {
                             0 => {
-                                temp_blg1 = number as f64;
+                                blood_glucose_1 = number as f64;
                                 was_working = true;
-                            },
-                            1 => long_units_1 = number as f64,
-                            2 => fast_units_1 = number as f64,
-                            3 => food_eaten = number as u8,
-                            4 => temp_time1 = (number / 3600.0) as f64,
+                            }
+                            1 => u40_units_1 = number as f64,
+                            2 => u100_units_1 = number as f64,
+                            3 => food_eaten = number as f64,
+                            4 => time_1 = (number / 3600.0) as f64,
                             5 => {
                                 _cur_day = number as u16;
-                                println!["{}", &_cur_day];
                                 if first_run {
                                     last_day = _cur_day;
                                     first_run = false;
@@ -69,10 +73,13 @@ pub fn parse_data(file: &mut std::fs::File) -> Vec<data_point::DataTrack> {
                                 }
 
                                 // push this rows data to the data track
-                                cur_data_track.blood_glucose_vec.push((temp_time1, temp_blg1));
-                                cur_data_track.long_units_rendered_vec.push((temp_time1, long_units_1));
-                                cur_data_track.fast_units_rendered_vec.push((temp_time1, fast_units_1));
-                                cur_data_track.food_eaten_vec.push(food_eaten);
+                                cur_data_track.data_tensor.push((
+                                    time_1,
+                                    blood_glucose_1,
+                                    u40_units_1,
+                                    u100_units_1,
+                                    food_eaten,
+                                ));
                                 cur_data_track.day = _cur_day;
                             }
                             _ => {}
@@ -84,12 +91,12 @@ pub fn parse_data(file: &mut std::fs::File) -> Vec<data_point::DataTrack> {
                         if was_working == true {
                             data_track_by_day_vec.push(cur_data_track);
                         }
-                        break 'a
-                    },
+                        break 'a;
+                    }
                 }
             }
         }
-        return data_track_by_day_vec
+        return data_track_by_day_vec;
     }
 }
 
@@ -117,6 +124,3 @@ where
 
     Ok(())
 }
-
-
-

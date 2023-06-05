@@ -1,9 +1,9 @@
 use rayon::prelude::*;
 
-pub fn mean(data: &[(f64, f64)]) -> Option<f64> {
+pub fn mean(data: &[f64]) -> Option<f64> {
     match data.len() {
         count if count > 0 => {
-            let sum: f64 = data.par_iter().map(|item| item.1).sum();
+            let sum: f64 = data.par_iter().map(|item| item).sum::<f64>();
             let mean = sum as f64 / count as f64;
             Some(mean)
         }
@@ -16,13 +16,13 @@ pub fn mean(data: &[(f64, f64)]) -> Option<f64> {
 /// Multithreaded implementation of the sample standard deviation of an array/vector of float 64 numbers.
 /// Uses the multithreaded implementation of `mean` as well.
 /// The data type of mean must be castable to f64.
-pub fn std_deviation(data: &[(f64, f64)], mean: f64) -> Option<f64> {
+pub fn std_deviation(data: &[f64], mean: f64) -> Option<f64> {
     match data.len() {
         count if count > 0 => {
             let variance = data
                 .par_iter()
                 .map(|value| {
-                    let diff = mean - value.1;
+                    let diff = mean - value;
                     diff * diff
                 })
                 .sum::<f64>()
