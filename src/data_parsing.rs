@@ -8,13 +8,14 @@ const BITS_16: usize = 0xFFFF;
 
 pub fn openfile() -> Option<std::fs::File> {
     loop {
+        // Uncomment out these lines and delete the line following to enable being able to select your own file
         // Create a path to the desired file
         // println!["Enter the path to data, or ..exit to exit: "];
         // let path_str = readln![];
         // if path_str.trim() == "..exit" {
         //     return None
         // }
-        let path_str = "insulin.csv";
+        let path_str = "insulin.dat";
         let path: &Path = Path::new({
             let binding: &str = path_str.trim();
             binding
