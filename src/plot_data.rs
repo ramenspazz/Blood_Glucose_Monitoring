@@ -94,7 +94,7 @@ pub fn plot_data(data: &Vec<DataTrack>) {
 
         let daily_mean_blood_glucose = data_math::mean(&points).unwrap();
         match data_math::std_deviation(&points, daily_mean_blood_glucose) {
-            Some(std_dev) => {
+            Ok(std_dev) => {
                 println!(
                     "Hana's average bgl for day {} with {} measurement(s) is {:.2}, with a S.D. of {:.2}.",
                     &track.day,
@@ -111,8 +111,8 @@ pub fn plot_data(data: &Vec<DataTrack>) {
                 // Add legend label
                 legend_labels.push((track.day.to_string(), cur_color));
             }
-            None => {
-                println!("ERROR: could not process data! Exiting...\n");
+            Err(e) => {
+                println!("ERROR: could not process data!\n{}\n", e);
                 return;
             }
         }
@@ -122,7 +122,7 @@ pub fn plot_data(data: &Vec<DataTrack>) {
     let drawing_area = chart_context.plotting_area().clone();
     for (i, &(ref label, color)) in legend_labels.iter().enumerate() {
         let rect_width: f64 = 0.5f64;                            // Width of the legend color rectangle
-        let rect_height: f64 = 20f64;                            // Height of the legend color rectangle
+        let rect_height: f64 = 12f64;                            // Height of the legend color rectangle
         let rect_x: f64 = 1.5f64;                                // X coordinate of the top-left corner of the rectangle
         let rect_y = (i * 25 + 5 + 256 + 128) as f64;       // Y coordinate of the top-left corner of the rectangle
         let text_x: f64 = 2.125f64;                              // X coordinate of the legend label
