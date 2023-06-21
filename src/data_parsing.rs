@@ -8,7 +8,6 @@ const BITS_16: usize = 0xFFFF;
 
 pub fn openfile() -> Option<std::fs::File> {
     loop {
-        // Uncomment out these lines and delete the line following to enable being able to select your own file
         // Create a path to the desired file
         // println!["Enter the path to data, or ..exit to exit: "];
         // let path_str = readln![];
@@ -36,7 +35,7 @@ pub fn parse_data(file: &mut std::fs::File) -> Vec<data_point::DataTrack> {
     let mut last_day: u16 = 0;
     let mut first_run: bool = true;
 
-    loop {
+    'parse_days: loop {
         let mut cur_data_track: data_point::DataTrack = data_point::DataTrack::new();
         let mut blood_glucose_1: f64 = 0f64;
         let mut u100_units_1: f64 = 0f64;
@@ -46,10 +45,10 @@ pub fn parse_data(file: &mut std::fs::File) -> Vec<data_point::DataTrack> {
 
         let mut was_working: bool = false;
 
-        'a: for _ in 0..MAX_SIZE {
+        'parse_days_data: for _ in 0..MAX_SIZE {
             // this loop will go for MAX_SIZE data rows total
             for j in 0..6 {
-                // this loop collects a current rows data
+                // this loop collects a current row's data
                 match readin::readin(file) {
                     Some(number) => {
                         match j {
@@ -73,7 +72,7 @@ pub fn parse_data(file: &mut std::fs::File) -> Vec<data_point::DataTrack> {
                                     last_day = _cur_day;
                                 }
 
-                                // push this rows data to the data track
+                                // push this row's data to the data track
                                 cur_data_track.data_tensor.push((
                                     time_1,
                                     blood_glucose_1,
@@ -86,19 +85,22 @@ pub fn parse_data(file: &mut std::fs::File) -> Vec<data_point::DataTrack> {
                             _ => {}
                         }
                     }
-                    // we are now done reading data and break the main loop
-                    None => {
-                        // if this is the last entry, push it to the data vec and then return
-                        if was_working == true {
-                            data_track_by_day_vec.push(cur_data_track);
-                        }
-                        break 'a;
-                    }
+                    // EOF reached, break the loops
+                    None => break 'parse_days_data,
                 }
             }
         }
-        return data_track_by_day_vec;
+
+        // Push the last data track if it was working
+        if was_working == true {
+            data_track_by_day_vec.push(cur_data_track);
+        } else {
+            break 'parse_days
+        }
+        
     }
+
+    data_track_by_day_vec // return the data track vector
 }
 
 pub fn write_to_file<T>(format_str: String, numbers: Vec<T>) -> std::io::Result<()>

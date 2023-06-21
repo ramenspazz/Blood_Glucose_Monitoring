@@ -28,17 +28,17 @@ impl DataTrack {
         if self.data_tensor.len() <= 1 {
             return Err("Insufficient data points".to_string());
         } else if range_start == range_end || range_end >= self.data_tensor.len() {
-            return Err("Invalid range".to_string());
+            return Err(format!("Invalid range! Max index is {}; Got, [{}, {}]", self.data_tensor.len() - 1, range_start, range_end).to_string());
         }
 
         let vec_end_ref = match self.data_tensor.get(range_end) {
             Some(value) => *value,
-            None => return Err("Invalid range".to_string()),
+            None => return Err(format!("Invalid range! Max index is {}; Got, [{}, {}]", self.data_tensor.len() - 1, range_start, range_end).to_string()),
         };
 
         let vec_start_ref = match self.data_tensor.get(range_start) {
             Some(value) => *value,
-            None => return Err("Invalid range".to_string()),
+            None => return Err(format!("Invalid range! Max index is {}; Got, [{}, {}]", self.data_tensor.len() - 1, range_start, range_end).to_string()),
         };
 
         let delta_time_end_start = self.data_tensor[range_end].0 - self.data_tensor[range_start].0;

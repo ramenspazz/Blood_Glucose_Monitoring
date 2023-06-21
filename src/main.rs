@@ -27,10 +27,10 @@ fn main() {
     for track in data.iter() {
         let mut diff_vec: Vec<Vec<f64>> = vec![];
         if track.data_tensor.len() > 1 {
-            for i in 1..track.data_tensor.len() {
+            for i in 0..(track.data_tensor.len() - 1) {
                 diff_vec.push(
                     track
-                        .d_tensor((i as usize) - 1, i as usize)
+                        .d_tensor(i, i+1)
                         .unwrap()
                 );
             }
@@ -47,17 +47,4 @@ fn main() {
             }
         }
     }
-    // println!["{:.4?}", &data_fit];
-
-    // let weighted_avg: f64 = {
-    //     std::iter::zip(&data, &transformed_data)
-    //         .map(|(a, b)| (a.blood_glucose_vec.len() as f64) * b)
-    //         .sum::<f64>()
-    //         /
-    //         data
-    //             .iter()
-    //             .map(|a| a.blood_glucose_vec.len() as f64)
-    //             .sum::<f64>()
-    // };
-    // println!("Weighted average: {:.2}", weighted_avg);
 }
